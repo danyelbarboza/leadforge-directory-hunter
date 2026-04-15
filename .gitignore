@@ -1,0 +1,113 @@
+# .gitignore para projeto Python com Jupyter/VSCode e pastas de dados
+
+# Byte-compiled / optimized / DLLs
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# virtualenv / venv
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# VS Code
+.vscode/
+
+# IDEs
+.idea/
+
+# mypy
+.mypy_cache/
+
+# logs and databases
+*.log
+*.sql
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Windows shortcuts
+*.lnk
+
+# dotenv and secrets
+.env
+.env.*
+credentials.json
+secrets.json
+*.pem
+*.key
+
+# Webdriver logs
+chromedriver.log
+geckodriver.log
+
+# Dados (normalmente não versionar grandes arquivos de dados)
+/data/
+data/
+
+# Arquivos temporários comuns
+*.tmp
+*.temp
+
+# Arquivos de configuração local
+local_settings.py
+
+# Se quiser manter algum arquivo de dados específico, adicione-o manualmente ao repositório com:
+# git add -f path/to/file

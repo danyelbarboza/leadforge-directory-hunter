@@ -1,5 +1,3 @@
-# .gitignore para projeto Python com Jupyter/VSCode e pastas de dados
-
 # Byte-compiled / optimized / DLLs
 __pycache__/
 *.py[cod]

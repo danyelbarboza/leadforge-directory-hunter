@@ -96,11 +96,20 @@ secrets.json
 chromedriver.log
 geckodriver.log
 
-# Dados (normalmente não versionar grandes arquivos de dados)
-/data/
-data/
+# Dados (ignore arquivos HTML brutos e outputs grandes)
+/data/bronze/html_*/**/*.html
+/data/gold/**/*.csv
+/data/gold/**/*.parquet
+/data/silver/
 
-# Arquivos temporários comuns
+# Mas mantenha a estrutura de diretórios e arquivos metadados
+!data/
+!data/bronze/
+!data/gold/
+!data/.gitkeep
+!data/bronze/.gitkeep
+!data/gold/.gitkeep
+!/data/bronze/company_profile_links_cache.csv
 *.tmp
 *.temp
 

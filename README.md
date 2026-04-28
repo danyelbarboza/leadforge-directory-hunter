@@ -1,203 +1,199 @@
 # LeadForge Directory Hunter
 
-Web scraping pipeline for public company directories, focusing on **B2B lead generation**, **data normalization**, and **business-ready delivery**.
+Web scraping and data extraction pipeline for business directories, focusing on **B2B lead generation**, **structured data extraction**, and **scalable processing**.
 
-The project was designed to simulate a real-world web scraping freelancing scenario: collecting company data from online directories, extracting relevant fields, processing the data, saving it to a database, and exporting a useful dataset for sales, research, or market intelligence.
+The project was designed to simulate a real-world web scraping scenario: collecting company profile HTML from online directories, extracting relevant fields using robust parsing, normalizing the data with PySpark, and preparing a dataset for sales, research, or market intelligence.
 
 ---
 
 ## Overview
 
-**LeadForge Directory Hunter** is a modular scraper for business directories.
+**LeadForge Directory Hunter** is a two-layer data architecture with modular extraction pipelines.
 
 It allows you to:
 
-- Collect listing pages
-- Discover company profile URLs
-- Extract structured data from detail pages
-- Standardize and enrich the data
-- Save everything to PostgreSQL
-- Export CSVs for immediate use
-- Generate a lead quality score
-- Serve as a foundation for future dashboards and automations
+- Collect and store raw HTML profiles (**Bronze Layer**)
+- Extract structured fields from HTML using regex-based parsers
+- Transform and enrich data using PySpark for scalability
+- Parse JSON-LD schema data embedded in HTML
+- Derive business intelligence metrics (ratings, reviews, services, etc.)
+- Export enriched datasets for downstream use
+- Serve as a foundation for lead scoring and CRM integration
 
 ---
 
 ## Project Goal
 
-This project was built to demonstrate practical competencies in:
+This project demonstrates practical competencies in:
 
-- Python
-- Web Scraping
-- ETL (Extract, Transform, Load)
-- PostgreSQL
-- Data Modeling
-- Data Cleaning and Standardization
-- Pipeline Architecture
-- Basic Observability
-- Project organization for portfolios and freelancing
-
-More than just “scraping a website,” the proposal is to deliver a **data mini-product**.
+- Python (3.11+)
+- Web scraping and HTML parsing
+- ETL (Extract, Transform, Load) with PySpark
+- Regex-based data extraction
+- JSON-LD schema parsing
+- Data normalization and cleaning
+- PySpark DataFrames and distributed computing
+- Project organization and reproducibility
 
 ---
 
 ## Use Case
 
-Imagine a client needs a database of companies in a specific niche, including information such as:
+Imagine a client needs a database of service provider companies with structured intelligence, including:
 
-- Company name
-- Location
-- Website
-- Price range
-- Team size
-- Services offered
-- Description
-- Reviews
-- Lead quality score
+- Company name / profile title
+- Website URL
+- Overall rating (from embedded schema)
+- Review count
+- Services offered (with percentages)
+- Profile description
+- Business details (min project size, hourly rate, employee range, locations, year founded, languages)
 
-This project solves exactly this type of problem.
+This project extracts exactly this information from raw HTML profiles and consolidates it into a clean, queryable dataset using PySpark.
 
 ---
 
 ## Architecture
 
-List Pages
+Raw HTML Files (Bronze Layer)
    ↓
-Collect Company URLs
+Load HTML into Spark DataFrame
    ↓
-Detail Page Scraper
+Extract Metadata from Filenames
    ↓
-Raw HTML Storage
+Regex-based Field Extraction
+   ├─ Profile Title
+   ├─ Website URL (with query param parsing)
+   ├─ Profile Description
+   ├─ Services (with percentages)
+   ├─ Business Details (6 fields)
+   └─ Ratings/Reviews (from JSON-LD schema)
    ↓
-Parser / Normalizer
+PySpark DataFrame Enrichment (UDFs)
    ↓
-PostgreSQL
+Flattened & Normalized Output
    ↓
-Lead Scoring
-   ↓
-CSV Export + Dashboard
+Export / Downstream Processing
 
 ---
 
 ## Stack
 
-* **Python**
-* **Requests**
-* **BeautifulSoup / lxml**
-* **Selenium**
-* **Pandas**
-* **SQLAlchemy**
-* **PostgreSQL**
-* **Docker / Docker Compose**
-* **Streamlit** 
+* **Python 3.11+**
+* **PySpark 4.1.1** (local execution mode)
+* **Pandas** (optional, for export/analysis)
+* **Standard Library** (regex, json, pathlib, urllib.parse, html.unescape)
+* **Jupyter Notebooks** (for interactive exploration)
+* Optional: PostgreSQL (future integration), Streamlit (future dashboarding) 
 
 ---
 
 ## Project Structure
 
+```
 leadforge-directory-hunter/
 │
 ├── README.md
-├── .env.example
-├── docker-compose.yml
-├── pyproject.toml
-├── requirements.txt
 │
 ├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── exports/
+│   ├── bronze/
+│   │   ├── company_profile_links_cache.csv     (source URLs)
+│   │   └── html_YYYYMMDD_HHMMSS/               (raw HTML storage)
+│   │       └── *.html                          (profile pages)
+│   ├── gold/                                   (future: processed output)
+│   └── silver/                                 (future: intermediate layer)
 │
 ├── notebooks/
-│   └── exploratory_analysis.ipynb
+│   ├── notebook_clutch_web_scrawler.ipynb      (scraper - collects HTML)
+│   ├── notebook_parser.ipynb                   (parser - extracts fields)
+│   └── downloaded_files/                       (temporary downloads)
 │
-├── sql/
-│   ├── init.sql
-│   └── queries.sql
+├── venv/                                       (Python virtual environment)
 │
-├── src/
-│   └── directory_hunter/
-│       ├── __init__.py
-│       ├── config.py
-│       ├── logging.py
-│       ├── main.py
-│       │
-│       ├── clients/
-│       │   ├── base_client.py
-│       │   └── http_client.py
-│       │
-│       ├── spiders/
-│       │   ├── base_spider.py
-│       │   ├── clutch_list_spider.py
-│       │   └── clutch_detail_spider.py
-│       │
-│       ├── parsers/
-│       │   ├── base_parser.py
-│       │   └── clutch_parser.py
-│       │
-│       ├── models/
-│       │   ├── raw_page.py
-│       │   ├── company.py
-│       │   ├── company_service.py
-│       │   ├── run.py
-│       │   └── error_log.py
-│       │
-│       ├── pipelines/
-│       │   ├── collect_urls.py
-│       │   ├── scrape_details.py
-│       │   ├── normalize_companies.py
-│       │   ├── score_leads.py
-│       │   └── export_csv.py
-│       │
-│       ├── storage/
-│       │   ├── postgres.py
-│       │   └── file_store.py
-│       │
-│       ├── scoring/
-│       │   └── lead_score.py
-│       │
-│       └── utils/
-│           ├── helpers.py
-│           ├── retry.py
-│           └── validators.py
-│
-├── tests/
-│   ├── test_parsers.py
-│   ├── test_scoring.py
-│   └── test_normalization.py
-│
-└── dashboards/
-    └── streamlit_app.py
+└── (future: src/, sql/, dashboards/, tests/)
+```
+
+### Data Flow
+
+1. **notebook_clutch_web_scrawler.ipynb**
+   - Reads `company_profile_links_cache.csv`
+   - Fetches HTML pages from Clutch profiles
+   - Saves raw HTML to `data/bronze/html_YYYYMMDD_HHMMSS/`
+   - Records metadata in filenames: `company-slug_YYYYMMDD_HHMMSS_sequence.html`
+
+2. **notebook_parser.ipynb**
+   - Loads all HTML files from bronze layer using PySpark
+   - Extracts structured fields via regex-based parsing
+   - Parses JSON-LD schema for ratings/reviews
+   - Returns enriched Spark DataFrame (22 columns)
+   - Ready for export or downstream analysis
 
 ---
 
 ## Features
 
-### 1. Listing Page Collection
-Fetches public directory pages and collects links to company profiles.
+### 1. **Bronze Layer Storage**
+Stores raw HTML files with consistent metadata-driven naming:
+- `company-slug_YYYYMMDD_HHMMSS_sequence.html`
+- Enables reproducible parsing and auditability
 
-### 2. Detail Page Extraction
-Visits each individual profile to extract richer data fields.
+### 2. **Metadata Extraction**
+Parses filename pattern to derive:
+- Company slug / identifier
+- Collection timestamp
+- File sequence number
 
-### 3. Raw Storage
-Saves HTML and collection metadata for auditing, reprocessing, and debugging.
+### 3. **HTML-to-Structured Data Extraction**
+Robust regex-based extraction (no external HTML libraries to avoid serialization issues):
+- **Profile Title**: From `class="profile-header__title"`
+- **Website URL**: From visit-website action, with URL parameter decoding
+- **Profile Description**: From summary text block
+- **Services**: Chart legend items with percentages
+- **Business Details**: 6 fields from profile summary list
+- **Ratings & Reviews**: From JSON-LD `aggregateRating` schema
 
-### 4. Normalization
-Standardizes fields such as:
-* Location
-* Currency
-* Price range
-* Employee range
-* Service categories
+### 4. **JSON-LD Schema Parsing**
+- Extracts `<script type="application/ld+json">` blocks
+- Recursively searches for `aggregateRating` objects
+- Handles nested structures and variable field ordering
 
-### 5. Deduplication
-Prevents duplicate records based on:
-* Website domain
-* Company name
-* Location
+### 5. **PySpark Processing**
+- Loads HTML files via Spark binary file source
+- Applies extraction UDFs row-by-row
+- Flattens nested structures
+- Returns normalized DataFrame (22 columns)
 
-### 6. Lead Scoring
-Applies a simple rule set to rank the quality of the collected leads.
+### 6. **Data Quality**
+- Handles missing/malformed data gracefully (returns None)
+- Type safety via explicit Spark schemas
+- HTML entity decoding and text normalization
+
+### Output Dataset (22 Columns)
+
+| Column | Type | Source |
+|--------|------|--------|
+| record_type | string | literal "html" |
+| company_slug | string | filename parse |
+| source_folder | string | file path |
+| source_file | string | relative path |
+| file_name | string | filename |
+| extension | string | ".html" |
+| file_size_bytes | long | file stat |
+| file_sequence | int | filename parse |
+| collected_at | timestamp | filename parse |
+| html | string | file content |
+| profile_title | string | HTML regex |
+| website_url | string | HTML regex + URL parse |
+| profile_description | string | HTML regex |
+| services | string | HTML regex (semicolon-separated) |
+| minimum_project_size | string | HTML regex |
+| hourly_rate | string | HTML regex |
+| employee_range | string | HTML regex |
+| locations | string | HTML regex |
+| year_founded | int | HTML regex + year extraction |
+| languages | string | HTML regex |
+| overall_rating | double | JSON-LD schema |
+| review_count | int | JSON-LD schema |
 
 ### 7. Exporting
 Generates structured files for analysis or client delivery:
@@ -221,49 +217,51 @@ Stores structured company data.
 Relates companies to the services found.
 * `company_id`, `service_name`
 
-### `runs`
-Tracks pipeline executions.
-* `id`, `source`, `started_at`, `finished_at`, `status`, `pages_collected`, `companies_extracted`, `errors_count`
+## Implementation Notes
 
-### `error_logs`
-Logs process failures.
-* `id`, `url`, `stage`, `error_message`, `created_at`
+### Regex-Based Extraction
 
----
+The parser uses pure Python `re` module (no external HTML libraries) to avoid Spark worker serialization issues. Key patterns:
 
-## Lead Scoring
+- **Class selectors**: `class="[^"]*target-class[^"]*"`
+- **Content capture**: `(?P<content>.*?)` with `re.DOTALL` flag
+- **URL parsing**: `urllib.parse` for query parameter extraction
+- **HTML normalization**: `html.unescape()` + regex tag removal
 
-Simple scoring example:
-* +25 if it has a website
-* +20 if it has an hourly rate
-* +20 if it has a minimum project size
-* +15 if it has a rich description
-* +10 if it has reviews
-* +10 if it has multiple services
+### JSON-LD Schema Parsing
 
-Classification:
-* **0–39** → Weak lead
-* **40–69** → Medium lead
-* **70–100** → Strong lead
+Robust extraction that handles:
+- Multiple `<script type="application/ld+json">` blocks
+- Nested object structures
+- Variable field ordering
+- Fallback to None for missing data
+
+### PySpark Design
+
+- **Execution Mode**: Local (`local[*]`)
+- **UDF Pattern**: Python functions → F.udf() → explicit Spark types
+- **Type Safety**: StructType schemas for nested returns
+- **Efficiency**: Batch processing via DataFrame operations
 
 ---
 
 ## How to Run Locally
 
+### Prerequisites
+- Python 3.11+
+- Java (for PySpark)
+- Jupyter Notebook or JupyterLab
+
 ### 1. Clone the repository
 ```bash
-git clone [https://github.com/danyelbarboza/leadforge-directory-hunter.git](https://github.com/danyelbarboza/leadforge-directory-hunter.git)
+git clone <repository-url>
 cd leadforge-directory-hunter
 ```
 
 ### 2. Create and activate a virtual environment
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-On Windows:
-```bash
-.venv\Scripts\activate
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 ### 3. Install dependencies
@@ -271,87 +269,111 @@ On Windows:
 pip install -r requirements.txt
 ```
 
-### 4. Configure environment variables
-Create a `.env` file based on `.env.example`.
-```env
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_DB=directory_hunter
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
+### 4. Prepare data (Bronze Layer)
+
+Ensure raw HTML files exist in:
+```
+data/bronze/html_YYYYMMDD_HHMMSS/
+├── company-slug_YYYYMMDD_HHMMSS_001.html
+├── company-slug_YYYYMMDD_HHMMSS_002.html
+└── ...
 ```
 
-### 5. Start the database with Docker
+Or run the scraper notebook first:
 ```bash
-docker compose up -d
+jupyter notebook notebooks/notebook_clutch_web_scrawler.ipynb
 ```
 
-### 6. Execute the pipeline
-Example commands:
+### 5. Run the parser
 ```bash
-python -m directory_hunter.main collect-urls --source clutch --category "web-development" --country "br"
-python -m directory_hunter.main scrape-details --source clutch
-python -m directory_hunter.main normalize --source clutch
-python -m directory_hunter.main score-leads --source clutch
-python -m directory_hunter.main export --source clutch --format csv
+jupyter notebook notebooks/notebook_parser.ipynb
+```
+
+This will:
+1. Load all HTML files from the bronze layer
+2. Extract structured fields
+3. Return an enriched PySpark DataFrame
+4. Display a preview of the results
+
+### 6. Export results
+
+From the notebook, you can export to CSV:
+```python
+# Convert to Pandas for export
+df_export = df_bronze.select(*preview_columns).toPandas()
+df_export.to_csv('data/gold/profiles_enriched.csv', index=False)
 ```
 
 ---
 
 ## Output Example
 
-Example of exported columns:
+Preview of extracted fields:
 
-| company_name | website     | country | city      | hourly_rate | employee_range | lead_score |
-| ------------ | ----------- | ------- | --------- | ----------- | -------------- | ---------- |
-| Example Co   | example.com | Brazil  | São Paulo | $25-$49     | 10-49          | 82         |
+| profile_title | website_url | overall_rating | review_count | services | hourly_rate |
+|---|---|---|---|---|---|
+| Example Agency | https://example.com | 5.0 | 42 | Web Development 35%; UI/UX Design 40%; ... | $50-$99/hr |
 
 ---
 
 ## Adopted Best Practices
 
-* Separation between collection, parsing, and persistence
-* Raw and structured storage
-* Modular design
-* Focus on reprocessing
-* Extensibility for multiple sites
-* Ready for light production use
+* Bronze/Silver/Gold data layering
+* Raw HTML retention for reproducibility
+* Metadata-driven file organization
+* Type-safe PySpark schemas
+* Graceful null handling
+* Modular extraction functions
+* Standard library preference (fewer dependencies)
 
 ---
 
 ## Limitations
 
-* Changes in the site's HTML may require selector updates
-* Some directories may use anti-bot protection
-* This project does not replace manual commercial validation
-* The lead score is heuristic and should be adjusted per use case
+* Clutch-specific selectors (extensible to other directories)
+* HTML structure changes require selector updates
+* Local execution mode (scale with Spark cluster if needed)
+* JSON-LD availability depends on target site
 
 ---
 
 ## Responsible Use
 
-This project is for educational and portfolio purposes.
-When using it in production, it is important to respect:
-* Target site terms of use
-* robots.txt where applicable
-* Rate limits
-* Responsible scraping best practices
-* Applicable data usage laws
+This project is for educational and portfolio purposes. When using it:
+
+* Respect target site **Terms of Use** and `robots.txt`
+* Implement appropriate rate limiting
+* Do not overload servers
+* Respect applicable data protection regulations (GDPR, CCPA, etc.)
+* Use data responsibly for intended business purpose
+* Consider commercial data licensing alternatives
+
+---
+
+## Future Enhancements
+
+* [ ] Silver layer with dedupe and enrichment logic
+* [ ] Gold layer with lead scoring
+* [ ] PostgreSQL persistence
+* [ ] Streamlit dashboard
+* [ ] Support for additional directories (G2, UpWork, etc.)
+* [ ] Automated HTML structure change detection
+* [ ] Schedule-based collection and refresh
+* [ ] API endpoint for dataset access
 
 ---
 
 ## Motivation
 
-This repository was created as part of a portfolio focused on freelancing in:
-* Web scraping
-* ETL
-* Data engineering
-* Automated collection
-* Data products
+This repository demonstrates practical competencies in:
 
-The idea is to demonstrate the ability not just to extract data, but to organize and transform collection into a useful business asset.
+* **Data Engineering**: ETL pipeline design with PySpark
+* **Web Data Extraction**: Robust parsing of unstructured HTML
+* **Schema Design**: Structured data modeling
+* **Scalability**: Spark for handling large datasets
+* **Code Quality**: Documented, tested, reproducible pipelines
 
----
+The goal is to showcase not just the ability to extract data, but to build thoughtfully-designed, maintainable **data products**.
 
 ## Author
 

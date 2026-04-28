@@ -1,0 +1,16 @@
+# Core Data Processing
+pyspark>=4.1.0
+pandas>=2.0.0
+
+# Jupyter Environment
+jupyter>=1.0.0
+jupyterlab>=4.0.0
+
+# Python Language Support
+python-dotenv>=1.0.0
+
+# Optional: Future integrations
+# sqlalchemy>=2.0.0
+# psycopg2-binary>=2.9.0
+# streamlit>=1.30.0
+# requests>=2.31.0
